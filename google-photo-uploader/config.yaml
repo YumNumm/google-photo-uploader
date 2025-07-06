@@ -1,0 +1,44 @@
+# Google Photo HEIF Uploader 設定ファイル
+
+# 監視対象ディレクトリ
+watch_directory: "/data/photos"
+
+# 処理対象ファイル拡張子
+supported_extensions:
+  - ".heif"
+  - ".heic"
+  - ".HEIF"
+  - ".HEIC"
+
+# rclone設定
+rclone:
+  # rclone リモート名（rclone config で設定した名前）
+  remote_name: "google-photos"
+  # Google Photosのアルバム名（オプション）
+  album_name: "Uploaded Photos"
+  # アップロード後の処理
+  delete_after_upload: false
+  # 重複チェック
+  check_duplicates: true
+
+# ログ設定
+logging:
+  # ログレベル（debug, info, warn, error）
+  level: "info"
+  # ログファイルパス（空の場合は標準出力）
+  file_path: ""
+  # ログローテーション
+  max_size: 10  # MB
+  max_backups: 5
+  max_age: 30  # days
+
+# アップロード設定
+upload:
+  # 並列アップロード数
+  concurrent_uploads: 2
+  # アップロード完了待機時間（秒）
+  wait_time: 30
+  # リトライ回数
+  retry_count: 3
+  # リトライ間隔（秒）
+  retry_interval: 5
