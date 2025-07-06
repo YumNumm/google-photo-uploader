@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  google-photo-uploader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: google-photo-uploader
+    restart: unless-stopped
+    
+    # 環境変数
+    environment:
+      - CONFIG_PATH=/app/config.yaml
+      - TZ=Asia/Tokyo
+    
+    # ボリュームマウント
+    volumes:
+      # 写真ディレクトリ（監視対象）
+      - ./photos:/data/photos
+      # rclone設定ファイル（ホスト側で事前設定が必要）
+      - ~/.config/rclone:/config/rclone:ro
+      # 設定ファイル（カスタム設定がある場合）
+      - ./config.yaml:/app/config.yaml:ro
+      # ログ出力用（オプション）
+      - ./logs:/app/logs
+    
+    # ログ設定
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+    
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    
+    # ヘルスチェック
+    healthcheck:
+      test: ["CMD", "ps", "aux", "|", "grep", "google-photo-uploader", "|", "grep", "-v", "grep"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# 外部で定義されたボリューム（オプション）
+volumes:
+  photos:
+    driver: local
+  rclone-config:
+    driver: local
+
+# ネットワーク設定（オプション）
+networks:
+  default:
+    driver: bridge
